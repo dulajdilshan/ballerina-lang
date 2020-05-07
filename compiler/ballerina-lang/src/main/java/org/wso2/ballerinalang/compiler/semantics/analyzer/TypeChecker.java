@@ -151,6 +151,7 @@ import org.wso2.ballerinalang.compiler.tree.types.BLangLetVariable;
 import org.wso2.ballerinalang.compiler.tree.types.BLangRecordTypeNode;
 import org.wso2.ballerinalang.compiler.tree.types.BLangValueType;
 import org.wso2.ballerinalang.compiler.util.BArrayState;
+import org.wso2.ballerinalang.compiler.util.ConcreteBTypeBuilder;
 import org.wso2.ballerinalang.compiler.util.ClosureVarSymbol;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
 import org.wso2.ballerinalang.compiler.util.FieldKind;
@@ -214,6 +215,7 @@ public class TypeChecker extends BLangNodeVisitor {
     private TypeParamAnalyzer typeParamAnalyzer;
     private BLangAnonymousModelHelper anonymousModelHelper;
     private SemanticAnalyzer semanticAnalyzer;
+    private ConcreteBTypeBuilder typeBuilder;
     private boolean nonErrorLoggingCheck = false;
     private int letCount = 0;
     private SymbolEnv narrowedQueryEnv;
@@ -257,6 +259,7 @@ public class TypeChecker extends BLangNodeVisitor {
         this.typeParamAnalyzer = TypeParamAnalyzer.getInstance(context);
         this.anonymousModelHelper = BLangAnonymousModelHelper.getInstance(context);
         this.semanticAnalyzer = SemanticAnalyzer.getInstance(context);
+        this.typeBuilder = new ConcreteBTypeBuilder();
     }
 
     public BType checkExpr(BLangExpression expr, SymbolEnv env) {
@@ -4647,6 +4650,9 @@ public class TypeChecker extends BLangNodeVisitor {
         }
 
         BType retType = typeParamAnalyzer.getReturnTypeParams(env, bInvokableType.getReturnType());
+        if (Symbols.isFlagOn(invokableSymbol.flags, Flags.NATIVE) && !invokableSymbol.params.isEmpty()) {
+            retType = typeBuilder.buildType(retType, iExpr);
+        }
 
         if (iExpr instanceof ActionNode && ((BLangInvocation.BLangActionInvocation) iExpr).async) {
             return this.generateFutureType(invokableSymbol, retType);

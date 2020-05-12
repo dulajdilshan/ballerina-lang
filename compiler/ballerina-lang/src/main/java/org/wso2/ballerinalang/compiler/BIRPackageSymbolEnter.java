@@ -809,6 +809,7 @@ public class BIRPackageSymbolEnter {
                             names.fromString(recordName), env.pkgSymbol.pkgID, null, env.pkgSymbol);
                     recordSymbol.scope = new Scope(recordSymbol);
                     BRecordType recordType = new BRecordType(recordSymbol);
+                    recordType.flags = flags;
                     recordSymbol.type = recordType;
 
                     compositeStack.push(recordType);
@@ -869,10 +870,12 @@ public class BIRPackageSymbolEnter {
                 case TypeTags.TYPEDESC:
                     BTypedescType typedescType = new BTypedescType(null, symTable.typeDesc.tsymbol);
                     typedescType.constraint = readTypeFromCp();
+                    typedescType.flags = flags;
                     return typedescType;
                 case TypeTags.STREAM:
                     BStreamType bStreamType = new BStreamType(TypeTags.STREAM, null, null, symTable.streamType.tsymbol);
                     bStreamType.constraint = readTypeFromCp();
+                    bStreamType.flags = flags;
                     boolean hasError = inputStream.readByte() == 1;
                     if (hasError) {
                         bStreamType.error = readTypeFromCp();
@@ -880,6 +883,7 @@ public class BIRPackageSymbolEnter {
                     return bStreamType;
                 case TypeTags.TABLE:
                     BTableType bTableType = new BTableType(TypeTags.TABLE, null, symTable.tableType.tsymbol);
+                    bTableType.flags = flags;
                     bTableType.constraint = readTypeFromCp();
                     boolean hasFieldNameList = inputStream.readByte() == 1;
                     boolean hasKeyConstraint = inputStream.readByte() == 1;
@@ -905,6 +909,7 @@ public class BIRPackageSymbolEnter {
                 case TypeTags.MAP:
                     BMapType bMapType = new BMapType(TypeTags.MAP, null, symTable.mapType.tsymbol);
                     bMapType.constraint = readTypeFromCp();
+                    bMapType.flags = flags;
                     return bMapType;
                 case TypeTags.INVOKABLE:
                     BInvokableType bInvokableType = new BInvokableType(null, null, null, null);
@@ -935,6 +940,7 @@ public class BIRPackageSymbolEnter {
                             .of(Flag.PUBLIC)), Names.EMPTY, env.pkgSymbol.pkgID, null, env.pkgSymbol.owner);
                     BArrayType bArrayType = new BArrayType(null, arrayTypeSymbol, size, BArrayState.valueOf(state));
                     bArrayType.eType = readTypeFromCp();
+                    bArrayType.flags = flags;
                     return bArrayType;
                 case TypeTags.UNION:
                     BTypeSymbol unionTypeSymbol = Symbols.createTypeSymbol(SymTag.UNION_TYPE, Flags.asMask(EnumSet
@@ -945,6 +951,7 @@ public class BIRPackageSymbolEnter {
                     for (int i = 0; i < unionMemberCount; i++) {
                         unionType.add(readTypeFromCp());
                     }
+                    unionType.flags = flags;
                     return unionType;
                 case TypeTags.PACKAGE:
                     // TODO fix
@@ -976,6 +983,7 @@ public class BIRPackageSymbolEnter {
                     BType detailsType = readTypeFromCp();
                     errorType.reasonType = reasonType;
                     errorType.detailType = detailsType;
+                    errorType.flags = flags;
                     errorSymbol.type = errorType;
                     errorSymbol.pkgID = pkgId;
                     errorSymbol.name = names.fromString(errorName);
@@ -994,6 +1002,7 @@ public class BIRPackageSymbolEnter {
                     BTypeSymbol tupleTypeSymbol = Symbols.createTypeSymbol(SymTag.TUPLE_TYPE, Flags.asMask(EnumSet
                             .of(Flag.PUBLIC)), Names.EMPTY, env.pkgSymbol.pkgID, null, env.pkgSymbol.owner);
                     BTupleType bTupleType = new BTupleType(tupleTypeSymbol, null);
+                    bTupleType.flags = flags;
                     int tupleMemberCount = inputStream.readInt();
                     List<BType> tupleMemberTypes = new ArrayList<>();
                     for (int i = 0; i < tupleMemberCount; i++) {
@@ -1004,6 +1013,7 @@ public class BIRPackageSymbolEnter {
                 case TypeTags.FUTURE:
                     BFutureType bFutureType = new BFutureType(TypeTags.FUTURE, null, symTable.futureType.tsymbol);
                     bFutureType.constraint = readTypeFromCp();
+                    bFutureType.flags = flags;
                     return bFutureType;
                 case TypeTags.FINITE:
                     String finiteTypeName = getStringCPEntryValue(inputStream);
@@ -1012,6 +1022,7 @@ public class BIRPackageSymbolEnter {
                             names.fromString(finiteTypeName), env.pkgSymbol.pkgID, null, env.pkgSymbol);
                     symbol.scope = new Scope(symbol);
                     BFiniteType finiteType = new BFiniteType(symbol);
+                    finiteType.flags = flags;
                     symbol.type = finiteType;
                     int valueSpaceSize = inputStream.readInt();
                     for (int i = 0; i < valueSpaceSize; i++) {
@@ -1038,6 +1049,7 @@ public class BIRPackageSymbolEnter {
                     } else {
                         objectType = new BObjectType(objectSymbol);
                     }
+                    objectType.flags = flags;
                     objectSymbol.type = objectType;
                     addShapeCP(objectType, cpI);
                     compositeStack.push(objectType);

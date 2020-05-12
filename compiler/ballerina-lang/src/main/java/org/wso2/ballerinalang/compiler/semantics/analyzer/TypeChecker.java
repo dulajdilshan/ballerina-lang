@@ -151,9 +151,9 @@ import org.wso2.ballerinalang.compiler.tree.types.BLangLetVariable;
 import org.wso2.ballerinalang.compiler.tree.types.BLangRecordTypeNode;
 import org.wso2.ballerinalang.compiler.tree.types.BLangValueType;
 import org.wso2.ballerinalang.compiler.util.BArrayState;
-import org.wso2.ballerinalang.compiler.util.ConcreteBTypeBuilder;
 import org.wso2.ballerinalang.compiler.util.ClosureVarSymbol;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
+import org.wso2.ballerinalang.compiler.util.ConcreteBTypeBuilder;
 import org.wso2.ballerinalang.compiler.util.FieldKind;
 import org.wso2.ballerinalang.compiler.util.ImmutableTypeCloner;
 import org.wso2.ballerinalang.compiler.util.Name;
@@ -4650,7 +4650,8 @@ public class TypeChecker extends BLangNodeVisitor {
         }
 
         BType retType = typeParamAnalyzer.getReturnTypeParams(env, bInvokableType.getReturnType());
-        if (Symbols.isFlagOn(invokableSymbol.flags, Flags.NATIVE) && !invokableSymbol.params.isEmpty()) {
+        if (Symbols.isFlagOn(invokableSymbol.flags, Flags.NATIVE)
+                && Symbols.isFlagOn(retType.flags, Flags.PARAMETERIZED)) {
             retType = typeBuilder.buildType(retType, iExpr);
         }
 

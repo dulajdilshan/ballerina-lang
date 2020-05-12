@@ -1138,7 +1138,14 @@ public class SymbolEnter extends BLangNodeVisitor {
             return;
         }
 
+        List<BType> fieldTypes = new ArrayList<>();
+        for (BField field : recordType.fields) {
+            BType type = field.type;
+            fieldTypes.add(type);
+        }
+
         if (recordTypeNode.restFieldType == null) {
+            symResolver.markParameterizedType(recordType, fieldTypes);
             if (recordTypeNode.sealed) {
                 recordType.restFieldType = symTable.noType;
                 return;
@@ -1148,6 +1155,8 @@ public class SymbolEnter extends BLangNodeVisitor {
         }
 
         recordType.restFieldType = symResolver.resolveTypeNode(recordTypeNode.restFieldType, env);
+        fieldTypes.add(recordType.restFieldType);
+        symResolver.markParameterizedType(recordType, fieldTypes);
     }
 
     private Collector<BField, ?, LinkedHashMap<String, BField>> getFieldCollector() {

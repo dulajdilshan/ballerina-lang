@@ -336,3 +336,58 @@ function assertEquality(any|error expected, any|error actual) {
 
     panic AssertionError(message = "expected '" + expected.toString() + "', found '" + actual.toString () + "'");
 }
+
+/////////////////////////// Tests for `fromJsonWithType()` ///////////////////////////
+
+type Student2 record {
+    string name;
+    int age;
+};
+
+function testFromJsonWithTypeRecord1() {
+    string str = "{\"name\":\"Name\", \"age\":35}";
+    json j = <json> str.fromJsonString();
+    Student2|error p = j.fromJsonWithType(Student2);
+
+    assert(p is Student2, true);
+    assert(p.toString(), "name=Name age=35");
+}
+
+type Student3 record {
+    string name;
+    int age?;
+};
+
+function testFromJsonWithTypeRecord2() {
+    string str = "{\"name\":\"Name\", \"age\":35}";
+    json j = <json> str.fromJsonString();
+    Student3|error p = j.fromJsonWithType(Student3);
+
+    assert(p is Student3, true);
+    assert(p.toString(), "name=Name age=35");
+}
+
+function testFromJsonWithTypeAmbiguousTargetType() {
+    string str = "{\"name\":\"Name\", \"age\":35}";
+    json j = <json> str.fromJsonString();
+    Student3|error p = j.fromJsonWithType(typedesc<Student2|Student3>);
+    assert(p is error, true);
+}
+
+function testFromJsonWithTypeFromNotJson() {
+    string str = "{\"name\":\"Name\", \"age\":35}";
+    Student3 student = {name: "Name"};
+    Student3|error p = student.fromJsonWithType(typedesc<Student2|Student3>);
+    assert(p is error, true);
+}
+
+function assert(anydata actual, anydata expected) {
+    if (expected != actual) {
+        typedesc<anydata> expT = typeof expected;
+        typedesc<anydata> actT = typeof actual;
+        string reason = "expected [" + expected.toString() + "] of type [" + expT.toString()
+                            + "], but found [" + actual.toString() + "] of type [" + actT.toString() + "]";
+        error e = error(reason);
+        panic e;
+    }
+}

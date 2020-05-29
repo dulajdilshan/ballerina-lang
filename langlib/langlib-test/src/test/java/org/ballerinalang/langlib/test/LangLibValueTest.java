@@ -187,4 +187,18 @@ public class LangLibValueTest {
             { "testMergeJsonFailureForValuesWithIntersectingCyclicRefererences" }
         };
     }
+
+    @Test(dataProvider = "fromJsonWithTypeFunctions")
+    public void testFromJsonWithType(String function) {
+        BRunUtil.invoke(compileResult, function);
+    }
+
+    @DataProvider(name = "fromJsonWithTypeFunctions")
+    public Object[][] fromJsonWithTypeFunctions() {
+        return new Object[][] {
+                { "testFromJsonWithTypeRecord1" },
+                { "testFromJsonWithTypeRecord2" },
+                { "testFromJsonWithTypeAmbiguousTargetType" }
+        };
+    }
 }

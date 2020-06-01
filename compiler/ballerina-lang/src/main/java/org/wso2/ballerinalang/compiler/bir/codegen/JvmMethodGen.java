@@ -228,18 +228,17 @@ import static org.wso2.ballerinalang.compiler.bir.model.InstructionKind.FP_LOAD;
 public class JvmMethodGen {
 
     private static final FunctionParamComparator FUNCTION_PARAM_COMPARATOR = new FunctionParamComparator();
+    private static ConcreteBTypeBuilder typeBuilder = new ConcreteBTypeBuilder();
     private int nextId = -1;
     private int nextVarId = -1;
     private JvmPackageGen jvmPackageGen;
     private SymbolTable symbolTable;
-    private ConcreteBTypeBuilder typeBuilder;
     private BUnionType errorOrNilType;
 
     public JvmMethodGen(JvmPackageGen jvmPackageGen) {
 
         this.jvmPackageGen = jvmPackageGen;
         this.symbolTable = jvmPackageGen.symbolTable;
-        this.typeBuilder = new ConcreteBTypeBuilder();
         this.errorOrNilType = BUnionType.create(null, symbolTable.errorType, symbolTable.nilType);
     }
 
@@ -1087,6 +1086,7 @@ public class JvmMethodGen {
     }
 
     private static String generateReturnType(BType bType, boolean isExtern /* = false */) {
+        bType = typeBuilder.buildType(bType);
 
         if (bType == null || bType.tag == TypeTags.NIL) {
             if (isExtern) {

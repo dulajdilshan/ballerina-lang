@@ -67,6 +67,11 @@ public class CompileTask implements Task {
         try {
             PackageCompilation packageCompilation = project.currentPackage().getCompilation();
             JBallerinaBackend jBallerinaBackend = JBallerinaBackend.from(packageCompilation, JdkVersion.JAVA_11);
+
+            // Testing
+
+            // ----
+
             DiagnosticResult diagnosticResult = jBallerinaBackend.diagnosticResult();
             diagnosticResult.diagnostics().forEach(d -> err.println(convertDiagnosticToString(d)));
             if (diagnosticResult.hasErrors()) {

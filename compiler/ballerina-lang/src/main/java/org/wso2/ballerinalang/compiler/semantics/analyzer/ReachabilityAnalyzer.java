@@ -580,7 +580,7 @@ public class ReachabilityAnalyzer extends SimpleBLangNodeAnalyzer<ReachabilityAn
                     !data.hasFunctionTerminated) {
                 Location closeBracePos = getEndCharPos(funcNode.pos);
                 this.dlog.error(closeBracePos, DiagnosticErrorCode.INVOKABLE_MUST_RETURN,
-                        funcNode.getKind().toString().toLowerCase());
+                    funcNode.getKind() == NodeKind.RESOURCE_FUNC ? "resource function" : funcNode.getKind().toString().toLowerCase());
             } else if (isNeverReturn && !data.hasFunctionTerminated) {
                 this.dlog.error(funcNode.pos, DiagnosticErrorCode.THIS_FUNCTION_SHOULD_PANIC);
             }
